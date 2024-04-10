@@ -569,7 +569,8 @@ export default class Core {
       return true
     }
   }
-
+  
+  //odr voir si point d'entree pour modif echelle est ici?
   xySettings() {
     let xyRatios = null
     const w = this.w

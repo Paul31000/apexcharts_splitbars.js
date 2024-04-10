@@ -17,13 +17,10 @@ class BarSplitted extends Bar {
     super(ctx, xyRatios)
     this.lastBarSerie = 0
     this.barInterval = 0
+    this.multiplyFactorY=3
   }
   
   draw(series, seriesIndex) {
-    console.log("split bars launched")
-    console.log(series);
-    //todo ajoute une serie total
-    //todo trouver la valeur la plus forte de total et l'assigner à lastBarSerie
     this.barInterval= this.returnSpacing(series)
 
     let w = this.w
@@ -165,7 +162,8 @@ class BarSplitted extends Bar {
             barHeight,
             yDivision,
           })
-          barWidth = this.series[i][j] / this.invertedYRatio
+          //odr barWidth a une influence sur le placement des labels
+          barWidth = this.series[i][j] / (this.invertedYRatio * this.multiplyFactorY)
         } else {
           
           paths = this.drawStackedColumnPaths({
@@ -258,7 +256,7 @@ class BarSplitted extends Bar {
         }
     }
 
-    return (valeurMax / this.invertedYRatio)+10
+    return (valeurMax / (this.invertedYRatio * this.multiplyFactorY) )+10
   }
 
   initialPositions(x, y, xDivision, yDivision, zeroH, zeroW, translationsIndex) {
@@ -376,7 +374,6 @@ class BarSplitted extends Bar {
               prevBarW +
               (this.isReversed ? prevBarW : 0) * 2
       } */
-      console.log(x)
       //barXPosition = bXP
       barXPosition = x
     } else { 
@@ -389,8 +386,10 @@ class BarSplitted extends Bar {
     } else {
       x =
         barXPosition +
-        this.series[i][j] / this.invertedYRatio -
-        (this.isReversed ? this.series[i][j] / this.invertedYRatio : 0) * 2
+        //odr
+        this.series[i][j] / (this.invertedYRatio * this.multiplyFactorY)  
+        //odr
+        //-(this.isReversed ? this.series[i][j] / this.invertedYRatio : 0) * 2
     }
 
     const paths = this.barHelpers.getBarpaths({
@@ -542,7 +541,7 @@ class BarSplitted extends Bar {
         barYPosition -
         this.series[i][j] / this.yRatio[translationsIndex] +
         (this.isReversed
-          ? this.series[i][j] / this.yRatio[translationsIndex]
+          ? this.series[i][j] / this.yRatio[translationsIndex]*this.multiplyFactorY
           : 0) *
           2
     } else {

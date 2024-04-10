@@ -19116,16 +19116,13 @@
       _this = _super.call(this, ctx, xyRatios);
       _this.lastBarSerie = 0;
       _this.barInterval = 0;
+      _this.multiplyFactorY = 3;
       return _this;
     }
     _createClass(BarSplitted, [{
       key: "draw",
       value: function draw(series, seriesIndex) {
         var _this2 = this;
-        console.log("split bars launched");
-        console.log(series);
-        //todo ajoute une serie total
-        //todo trouver la valeur la plus forte de total et l'assigner à lastBarSerie
         this.barInterval = this.returnSpacing(series);
         var w = this.w;
         this.graphics = new Graphics(this.ctx);
@@ -19244,7 +19241,8 @@
                 barHeight: barHeight,
                 yDivision: yDivision
               }));
-              barWidth = _this2.series[i][j] / _this2.invertedYRatio;
+              //odr barWidth a une influence sur le placement des labels
+              barWidth = _this2.series[i][j] / (_this2.invertedYRatio * _this2.multiplyFactorY);
             } else {
               paths = _this2.drawStackedColumnPaths(_objectSpread2(_objectSpread2({}, commonPathOpts), {}, {
                 xDivision: xDivision,
@@ -19318,8 +19316,6 @@
     }, {
       key: "returnSpacing",
       value: function returnSpacing(series) {
-        console.log("series");
-        console.log(series);
         var valeurMax = 0;
 
         // Parcourir chaque tableau dans le tableau principal
@@ -19350,9 +19346,7 @@
         } finally {
           _iterator.f();
         }
-        console.log("valeurMax");
-        console.log(valeurMax);
-        return valeurMax / this.invertedYRatio + 10;
+        return valeurMax / (this.invertedYRatio * this.multiplyFactorY) + 10;
       }
     }, {
       key: "initialPositions",
@@ -19447,7 +19441,6 @@
                   prevBarW +
                   (this.isReversed ? prevBarW : 0) * 2
           } */
-          console.log(x);
           //barXPosition = bXP
           barXPosition = x;
         } else {
@@ -19457,8 +19450,13 @@
         if (this.series[i][j] === null) {
           x = barXPosition;
         } else {
-          x = barXPosition + this.series[i][j] / this.invertedYRatio - (this.isReversed ? this.series[i][j] / this.invertedYRatio : 0) * 2;
+          x = barXPosition +
+          //odr
+          this.series[i][j] / (this.invertedYRatio * this.multiplyFactorY);
+          //odr
+          //-(this.isReversed ? this.series[i][j] / this.invertedYRatio : 0) * 2
         }
+
         var paths = this.barHelpers.getBarpaths({
           barYPosition: barYPosition,
           barHeight: barHeight,
@@ -19580,7 +19578,7 @@
           barYPosition = zeroH;
         }
         if (this.series[i][j]) {
-          y = barYPosition - this.series[i][j] / this.yRatio[translationsIndex] + (this.isReversed ? this.series[i][j] / this.yRatio[translationsIndex] : 0) * 2;
+          y = barYPosition - this.series[i][j] / this.yRatio[translationsIndex] + (this.isReversed ? this.series[i][j] / this.yRatio[translationsIndex] * this.multiplyFactorY : 0) * 2;
         } else {
           // fixes #3610
           y = barYPosition;
@@ -25375,6 +25373,7 @@
             if (w.config.chart.stacked && !w.config.chart.splitted) {
               var barStacked = new BarStacked(this.ctx, xyRatios);
               elGraph.push(barStacked.draw(columnSeries.series, columnSeries.i));
+              //odr
             } else if (w.config.chart.splitted) {
               var barSplitted = new BarSplitted(this.ctx, xyRatios);
               elGraph.push(barSplitted.draw(columnSeries.series, columnSeries.i));
@@ -25418,6 +25417,7 @@
               if (cnf.chart.stacked & !cnf.chart.splitted) {
                 var _barStacked = new BarStacked(this.ctx, xyRatios);
                 elGraph = _barStacked.draw(gl.series);
+                //odr
               } else if (cnf.chart.splitted) {
                 var _barSplitted = new BarSplitted(this.ctx, xyRatios);
                 elGraph.push(_barSplitted.draw(gl.series));
@@ -25592,6 +25592,8 @@
           return true;
         }
       }
+
+      //odr voir si point d'entree pour modif echelle est ici?
     }, {
       key: "xySettings",
       value: function xySettings() {
