@@ -1,4 +1,5 @@
 import Bar from '../charts/Bar'
+import BarSplitted from '../charts/BarSplitted'
 import BarStacked from '../charts/BarStacked'
 import BoxCandleStick from '../charts/BoxCandleStick'
 import CoreUtils from './CoreUtils'
@@ -268,15 +269,19 @@ export default class Core {
     this.ctx.rangeBar = new RangeBar(this.ctx, xyRatios)
     let radar = new Radar(this.ctx)
     let elGraph = []
-
+    console.log("ok5")
     if (gl.comboCharts) {
       if (areaSeries.series.length > 0) {
         elGraph.push(line.draw(areaSeries.series, 'area', areaSeries.i))
       }
       if (columnSeries.series.length > 0) {
-        if (w.config.chart.stacked) {
+        if (w.config.chart.stacked && ! w.config.chart.splitted) {
           let barStacked = new BarStacked(this.ctx, xyRatios)
           elGraph.push(barStacked.draw(columnSeries.series, columnSeries.i))
+        //odr
+        }else if(w.config.chart.splitted){
+          let barSplitted = new BarSplitted(this.ctx, xyRatios)
+          elGraph.push(barSplitted.draw(columnSeries.series, columnSeries.i))
         } else {
           this.ctx.bar = new Bar(this.ctx, xyRatios)
           elGraph.push(this.ctx.bar.draw(columnSeries.series, columnSeries.i))
@@ -328,6 +333,7 @@ export default class Core {
         )
       }
     } else {
+      
       switch (cnf.chart.type) {
         case 'line':
           elGraph = line.draw(gl.series, 'line')
@@ -336,10 +342,14 @@ export default class Core {
           elGraph = line.draw(gl.series, 'area')
           break
         case 'bar':
-          if (cnf.chart.stacked) {
+          if (cnf.chart.stacked & !cnf.chart.splitted) {
             let barStacked = new BarStacked(this.ctx, xyRatios)
             elGraph = barStacked.draw(gl.series)
-          } else {
+          //odr
+          }else if(cnf.chart.splitted){
+            let barSplitted = new BarSplitted(this.ctx, xyRatios)
+            elGraph.push(barSplitted.draw(gl.series))
+          }else {
             this.ctx.bar = new Bar(this.ctx, xyRatios)
             elGraph = this.ctx.bar.draw(gl.series)
           }
